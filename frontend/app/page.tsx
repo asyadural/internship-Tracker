@@ -1,7 +1,5 @@
-export default function Home() {
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-white">
-      <h1 className="text-4xl font-bold text-gray-800">Welcome</h1>
-    </div>
-  );
+import { redirect } from 'next/navigation'
+
+export default function HomePage() {
+  redirect('/login')
 }
