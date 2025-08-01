@@ -7,5 +7,5 @@ in the other terminal need to go in to the frontend folder using "cd frontend"
 again to download necessary modules type "npm i" and click enter
 then type "npm run dev" to run the code
 there you will see "http://localhost:3000" click on it
-to go to the login page add http://localhost:3000/login and if you dont have an account click below to create an account
+it will open a login page and if you dont have an account click below to create an account
 that is all! enjoy
