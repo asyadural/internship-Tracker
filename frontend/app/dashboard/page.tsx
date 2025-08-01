@@ -114,7 +114,7 @@ export default function DashboardPage() {
         {
           method: 'POST',
           credentials: 'include',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionStorage.getItem('token')}` },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             companyName,
             positionTitle,

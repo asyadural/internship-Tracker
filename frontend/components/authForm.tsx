@@ -42,6 +42,7 @@ export default function AuthForm({ type }: Props) {
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/${type}`,
         {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         }
