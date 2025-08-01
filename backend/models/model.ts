@@ -36,7 +36,8 @@ export type ApplicationStatus =
   | "Interviewing"
   | "Offer"
   | "Rejected"
-  | "No Response";
+  | "No Response"
+  | "To Be Applied";
 
 export interface IInternshipApplication extends BaseDocument {
   user: Schema.Types.ObjectId; 
@@ -59,7 +60,7 @@ const InternshipApplicationSchema = new Schema<IInternshipApplication>(
     applicationDate: { type: Date, default: Date.now },
     applicationStatus: {
       type: String,
-      enum: ["Applied", "Interviewing", "Offer", "Rejected", "No Response"],
+      enum: ["Applied", "Interviewing", "Offer", "Rejected", "No Response", "To Be Applied"],
       default: "Applied",
     },
     companyWebsite: { type: String },

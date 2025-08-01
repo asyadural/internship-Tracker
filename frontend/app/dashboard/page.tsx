@@ -3,7 +3,8 @@
 import useSWR from 'swr';
 import { useState, useMemo, useEffect } from 'react';
 import { FiLogOut } from 'react-icons/fi';
-import { BiSort } from 'react-icons/bi';
+import { BiSort, BiClipboard } from 'react-icons/bi';
+import { FaStar } from 'react-icons/fa';
 import {
   FaEdit,
   FaTrash,
@@ -25,7 +26,8 @@ export interface IInternshipApplication {
     | 'Interviewing'
     | 'Offer'
     | 'Rejected'
-    | 'No Response';
+    | 'No Response'
+    | 'To Be Applied';
   companyWebsite?: string;
   notes?: string;
 }
@@ -34,7 +36,7 @@ const STATUS_STYLES = {
   Applied: {
     text: 'Applied',
     color: 'bg-gray-200 text-gray-700',
-    icon: <FaQuestionCircle className="text-gray-500" />,
+    icon: <FaStar className="text-yellow-500" />,
   },
   Interviewing: {
     text: 'Interviewing',
@@ -55,6 +57,11 @@ const STATUS_STYLES = {
     text: 'No Response',
     color: 'bg-gray-200 text-gray-700',
     icon: <FaQuestionCircle className="text-gray-500" />,
+  },
+  'To Be Applied': {
+    text: 'To Be Applied',
+    color: 'bg-gray-200 text-gray-700',
+    icon: <BiClipboard className="text-black-500" />,
   },
 };
 
@@ -208,7 +215,7 @@ export default function DashboardPage() {
       <aside className="w-64 p-6 bg-white shadow-lg border-r border-slate-200">
         <h2 className="text-3xl font-extrabold text-slate-900 mb-6">Trackify</h2>
         <div className="space-y-2">
-          {['all', 'Applied', 'Interviewing', 'Offer', 'Rejected', 'No Response'].map(s => (
+          {['all', 'Applied', 'Interviewing', 'Offer', 'Rejected', 'No Response', 'To Be Applied'].map(s => (
             <button
               key={s}
               onClick={() => { setStatusFilter(s as any); setPage(1); }}
@@ -500,6 +507,7 @@ export default function DashboardPage() {
               <option value="Offer">Offer</option>
               <option value="Rejected">Rejected</option>
               <option value="No Response">No Response</option>
+              <option value="To Be Applied">To Be Applied</option>
             </select>
             <input
               value={companyWebsite}
