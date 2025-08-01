@@ -1,1 +1,175 @@
 
+# Dependencies
+node_modules/
+*/node_modules/
+**/node_modules/
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnpm-store/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+*.env
+.env.*
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+.nyc_output
+
+# Compiled binary addons
+build/Release
+
+# Build outputs
+build/
+dist/
+out/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+.tmp/
+tmp/
+
+# TypeScript
+*.tsbuildinfo
+.tscache/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+
+# Runtime configuration
+.npmrc
+.yarnrc
+.yarnrc.yml
+
+# Testing
+.jest/
+coverage/
+__tests__/__snapshots__/
+*.test.js.snap
+
+# ESLint
+.eslintcache
+
+# Stylelint
+.stylelintcache
+
+# Prettier
+.prettierignore
+
+# TypeScript
+tsconfig.tsbuildinfo
+
+# Webpack
+.webpack/
+
+# Rollup
+.rollup.cache/
+
+# Vite
+.vite/
+
+# SvelteKit
+.svelte-kit/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Certificates
+*.pem
+*.p12
+*.key
+*.crt
+*.cer
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# AWS
+.aws/
+
+# Firebase
+.firebase/
+.firebaserc
+firebase-debug.log
+
+# Vercel
+.vercel/
+
+# Sentry
+.sentryclirc
+
+# Local development
+.local/
+local/
+
+# Storybook
+storybook-static/
+
+# Rush
+common/temp/
+**/.rush/
+
+# Nx
+.nx/
+
+# Turbo
+.turbo/
