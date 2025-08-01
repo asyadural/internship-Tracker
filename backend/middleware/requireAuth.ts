@@ -6,16 +6,16 @@ const JWT_SECRET = process.env.JWT_SECRET!;
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
   let token: string | undefined;
 
-  // 1) Authorization header
+
   const authHeader = req.headers.authorization;
   if (authHeader?.startsWith('Bearer ')) {
     token = authHeader.slice(7);
   }
-  // 2) query parameter ?token=...
+
   else if (typeof req.query.token === 'string') {
     token = req.query.token;
   }
-  // 3) HttpOnly cookie
+
   else if (req.cookies?.token) {
     token = req.cookies.token;
   }

@@ -5,7 +5,6 @@ import { Router, Request, Response } from 'express';
 import crypto from 'crypto';
 import { VerificationCodes, EmailJSConfigs, EmailTemplates, Users, InternshipApplication} from "../models/model";
 import { sendEmail } from "../mini_services/emailjs";
-import { serialize } from 'cookie';
 
 dotenv.config();
 const authRouter = Router();
@@ -23,14 +22,14 @@ authRouter.post('/login', async (req: Request, res: Response) => {
     }
     const user = await Users.findOne({ email }).select('+password'); 
     if (!user)           
-      return res.status(401).json({ message: 'Invalid credentials.' });
+      return res.status(401).json({ message: 'There is no such user' });
     
     if (!user.isActive) 
       return res.status(403).json({ message: 'Account is inactive.' });
 
      const ok = await bcrypt.compare(password, user.password);
     if (!ok) 
-      return res.status(401).json({ message: 'Invalid credentials.' });
+      return res.status(401).json({ message: 'Wrong Password' });
     
     const payload: Record<string, unknown> = {
       sub:  user.id,
@@ -38,16 +37,6 @@ authRouter.post('/login', async (req: Request, res: Response) => {
     };
 
     const token   = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-
-    res.setHeader('Set-Cookie', serialize('token', token, {
-    httpOnly: true,
-    secure:  process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path:    '/',
-    maxAge:  60 * 60,      // 1 hour in seconds
-    }));
-
-// then just send back the user (no need to return the token in JSON)
   res.json({
     token,
       user: {

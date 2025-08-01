@@ -141,11 +141,9 @@ export default function VerificationPage() {
           />
         </div>
 
-        {/* Feedback */}
         {error && <p className="text-red-600 text-sm">{error}</p>}
         {success && <p className="text-green-600 text-sm">{success}</p>}
 
-        {/* Action */}
         <button
           onClick={handleVerifyCode}
           disabled={loading || code.length !== 6 || remainingTime === 0}
@@ -162,7 +160,6 @@ export default function VerificationPage() {
         </button>
       </div>
 
-      {/* Footer */}
       <p className="mt-6 text-center text-sm text-gray-500">
         Didn’t receive the code?{" "}
         <Link

@@ -37,7 +37,7 @@ export default function AuthForm({ type }: Props) {
         type === "signup"
           ? { firstname: firstName, lastname: lastName, email, password }
           : { email, password };
-
+        console.log('Logging in to:', `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/${type}`);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/${type}`,
         {

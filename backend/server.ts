@@ -31,8 +31,9 @@ app.get('/', (_req: Request, res: Response) => {
   res.send('✅ Internship Tracker API is up');
 });
 
-app.use('/', apiRouter);
 app.use('/auth', authRouter);
+app.use('/', apiRouter);
+
 
 
 app.listen(PORT, () => console.log(`Server is running at http://localhost:${PORT}`));

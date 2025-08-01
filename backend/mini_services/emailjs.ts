@@ -16,7 +16,7 @@ export async function sendEmail(
   const { service_id, template_id, public_key, private_key } = config;
 
   if (![service_id, template_id, public_key, private_key].every(Boolean)) {
-    console.error("❌ Missing EmailJS configuration");
+    console.error("Missing EmailJS configuration");
     return false;
   }
 
@@ -42,14 +42,14 @@ export async function sendEmail(
 
     if (!res.ok) {
       const body = await res.text();
-      console.error("❌ EmailJS error:", res.status, body);
+      console.error("EmailJS error:", res.status, body);
       return false;
     }
 
-    console.log("✅ Email sent");
+    console.log("Email sent");
     return true;
   } catch (err: any) {
-    console.error("❌ Failed to send email:", err.message);
+    console.error("Failed to send email:", err.message);
     return false;
   }
 }
