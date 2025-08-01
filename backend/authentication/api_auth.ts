@@ -49,6 +49,7 @@ authRouter.post('/login', async (req: Request, res: Response) => {
 
 // then just send back the user (no need to return the token in JSON)
   res.json({
+    token,
       user: {
     id:        user.id,
     firstname: user.firstname,
