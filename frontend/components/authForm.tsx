@@ -42,7 +42,6 @@ export default function AuthForm({ type }: Props) {
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/${type}`,
         {
           method: "POST",
-          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         }
@@ -54,6 +53,7 @@ export default function AuthForm({ type }: Props) {
       }
 
       // On success, cookie is set; just redirect
+      sessionStorage.setItem("token", data.token);
       router.push("/dashboard");
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
