@@ -5,6 +5,10 @@ import { useState, useMemo, useEffect } from 'react';
 import { FiLogOut } from 'react-icons/fi';
 import { BiSort, BiClipboard } from 'react-icons/bi';
 import { FaStar } from 'react-icons/fa';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+
 import {
   FaEdit,
   FaTrash,
@@ -70,7 +74,6 @@ const PAGE_SIZE = 9;
 export default function DashboardPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-
   const [statusFilter, setStatusFilter] = useState<'all' | IInternshipApplication['applicationStatus']>('all');
   const [search, setSearch] = useState('');
   const [sortField, setSortField] = useState<'name' | 'date'>('name');
@@ -88,9 +91,9 @@ export default function DashboardPage() {
   const [applicationStatus, setApplicationStatus] = useState<IInternshipApplication['applicationStatus']>('Applied');
   const [companyWebsite, setCompanyWebsite] = useState('');
   const [notes, setNotes] = useState('');
-
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Partial<IInternshipApplication>>({});
+  const [showCalendar, setShowCalendar] = useState(false);
 
   // Hydration guard
   useEffect(() => {
@@ -206,6 +209,15 @@ export default function DashboardPage() {
   const totalPages = Math.ceil(visible.length / PAGE_SIZE);
   const paged = visible.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
+  const STATUS_DATE_LABELS: Record<IInternshipApplication['applicationStatus'], string> = {
+  Applied: 'Application Date',
+  Interviewing: 'Interview Date',
+  Offer: 'Offer Date',
+  Rejected: 'Rejection Date',
+  'No Response': 'Application Date',
+  'To Be Applied': 'Target Application Date',
+  };
+
   if (!mounted) return null;
 
   return (
@@ -232,6 +244,16 @@ export default function DashboardPage() {
             </button>
           ))}
         </div>
+        {/* Calendar toggle button */}
+        <button
+          onClick={() => setShowCalendar(v => !v)}
+          className={`w-full flex items-center gap-3 text-left px-4 py-2 rounded-lg font-medium transition-colors ${
+          showCalendar ? 'bg-purple-600 text-white shadow-md' : 'text-slate-700 hover:bg-slate-100'
+          }`}
+>
+        <div className="p-1 rounded-full bg-slate-300">📅</div>
+              <span>Calendar View</span>
+                </button>
         <button
           onClick={logout}
           className="mt-8 flex items-center text-red-500 hover:text-red-700 font-medium space-x-2 transition-colors"
@@ -304,6 +326,41 @@ export default function DashboardPage() {
             <p className="text-center text-xl text-slate-500">No applications found.</p>
           ) : (
             <>
+            {showCalendar ? (
+              <div className="bg-white rounded-2xl p-6 shadow-md">
+                <FullCalendar
+                  plugins={[dayGridPlugin, interactionPlugin]}
+                    initialView="dayGridMonth"
+                        height="auto"
+                        events={(apps ?? []).map(app => ({
+                          title: app.companyName,
+                          extendedProps: { status: app.applicationStatus},
+                          date: app.applicationDate,
+                          start: app.applicationDate,
+                          allDay:true,
+                          backgroundColor:
+                            app.applicationStatus === 'Interviewing'
+                              ? '#bfdbfe'
+                              : app.applicationStatus === 'Offer'
+                              ? '#bbf7d0'
+                              : app.applicationStatus === 'Applied'
+                              ? '#fef9c3' 
+                              : app.applicationStatus === 'Rejected'
+                              ? '#fecaca'
+                              : app.applicationStatus === 'To Be Applied'
+                              ? '#e0e7ff'
+                              : '#e5e7eb',
+                            textColor: '#1f2937',
+                          }))}
+                          eventContent={({ event }) => (
+                            <div className="text-left whitespace-normal leading-tight">
+                            <div className="font-semibold">{event.title}</div>
+                            <div className="text-sm text-gray-700">{event.extendedProps.status}</div>
+                          </div>
+                        )}
+                        />
+                      </div>
+            ) : (  
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {paged.map(app => {
                   const isEditing = editingId === app._id;
@@ -394,7 +451,10 @@ export default function DashboardPage() {
                             <strong className="text-slate-800 font-semibold">Location:</strong> {app.location}
                           </p>
                           <p className="text-slate-600 mb-2">
-                            <strong className="text-slate-800 font-semibold">Applied:</strong> {new Date(app.applicationDate).toLocaleDateString()}
+                            <strong className="text-slate-800 font-semibold">
+                              {STATUS_DATE_LABELS[app.applicationStatus] || 'Date'}:
+                            </strong>{' '}
+                            {new Date(app.applicationDate).toLocaleDateString()}
                           </p>
                           {app.companyWebsite && (
                             <p className="text-slate-600 mb-2">
@@ -403,7 +463,7 @@ export default function DashboardPage() {
                                 href={app.companyWebsite}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-purple-600 hover:underline transition-colors"
+                                className="text-purple-800 hover:underline transition-colors break-words whitespace-normal"
                               >
                                 {app.companyWebsite}
                               </a>
@@ -436,8 +496,10 @@ export default function DashboardPage() {
                   );
                 })}
               </div>
+            )}
 
               {/* Pagination */}
+              {!showCalendar && (
               <div className="mt-8 flex justify-center space-x-4">
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
@@ -457,6 +519,7 @@ export default function DashboardPage() {
                   Next
                 </button>
               </div>
+              )}
             </>
           )}
         </main>
@@ -490,13 +553,6 @@ export default function DashboardPage() {
               required
               className="w-full p-4 border border-slate-300 rounded-xl outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
             />
-            <input
-              type="date"
-              value={applicationDate}
-              onChange={e => setApplicationDate(e.target.value)}
-              required
-              className="w-full p-4 border border-slate-300 rounded-xl outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-            />
             <select
               value={applicationStatus}
               onChange={e => setApplicationStatus(e.target.value as any)}
@@ -509,6 +565,18 @@ export default function DashboardPage() {
               <option value="No Response">No Response</option>
               <option value="To Be Applied">To Be Applied</option>
             </select>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">
+              {STATUS_DATE_LABELS[applicationStatus]}
+              </label>
+              <input
+                type="date"
+                value={applicationDate}
+                onChange={e => setApplicationDate(e.target.value)}
+                required
+                className="w-full p-4 border border-slate-300 rounded-xl outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+              />
+            </div>
             <input
               value={companyWebsite}
               onChange={e => setCompanyWebsite(e.target.value)}
@@ -540,6 +608,8 @@ export default function DashboardPage() {
           </form>
         </div>
       )}
+      <style jsx global>{`.fc .fc-day-today { background-color: #fce7f3 !important;
+        }`}</style>
     </div>
   );
 }

@@ -50,8 +50,7 @@ export interface IInternshipApplication extends BaseDocument {
   notes?: string;
 }
 
-const InternshipApplicationSchema = new Schema<IInternshipApplication>(
-  {
+const InternshipApplicationSchema = new Schema<IInternshipApplication>({
     ...BaseSchema.obj,
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
     companyName: { type: String, required: true },
