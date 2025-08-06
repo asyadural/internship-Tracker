@@ -5,10 +5,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { FiLogOut } from 'react-icons/fi';
 import { BiSort, BiClipboard } from 'react-icons/bi';
 import { FaStar } from 'react-icons/fa';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction';
-
+import AnalyticsComponent from '@/components/AnalyticsComponent';
+import CalendarComponent from '@/components/CalendarComponent';
 
 import {
   FaEdit,
@@ -94,7 +92,7 @@ export default function DashboardPage() {
   const [notes, setNotes] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Partial<IInternshipApplication>>({});
-  const [showCalendar, setShowCalendar] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'calendar' | 'analytics'>('grid');
 
   // Hydration guard
   useEffect(() => {
@@ -187,7 +185,12 @@ export default function DashboardPage() {
   // Filtering + sorting
   const visible = useMemo(() => {
     let list = (apps ?? [])
-      .filter(a => statusFilter === 'all' || a.applicationStatus === statusFilter)
+      .filter(a => {
+        if (viewMode !== 'grid') return true;
+        if (statusFilter === 'all') return true;
+        return a.applicationStatus === statusFilter;
+      })
+
       .filter(a => {
         const q = search.toLowerCase();
         return (
@@ -219,6 +222,30 @@ export default function DashboardPage() {
   'To Be Applied': 'Target Application Date',
   };
 
+  function getSuggestion(app: IInternshipApplication): string | null {
+  const daysSince = Math.floor(
+    (Date.now() - new Date(app.applicationDate).getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  if (app.applicationStatus === 'No Response' && daysSince >= 10) {
+    return `You applied ${daysSince} days ago with no response. Consider sending a follow-up email.`;
+  }
+
+  if (app.applicationStatus === 'Interviewing' && app.notes?.toLowerCase().includes('waiting')) {
+    return `You mentioned waiting for a reply. Consider checking in with the recruiter.`;
+  }
+
+  if (app.applicationStatus === 'To Be Applied') {
+    return `You marked this for future application. Make sure to apply soon!`;
+  }
+
+  if (app.applicationStatus === 'Rejected' && app.notes?.toLowerCase().includes('feedback')) {
+    return `You got feedback — use it to improve your resume or next interview.`;
+  }
+
+  return null;
+}
+
   if (!mounted) return null;
 
   return (
@@ -231,9 +258,9 @@ export default function DashboardPage() {
           {['all', 'Applied', 'Interviewing', 'Offer', 'Rejected', 'No Response', 'To Be Applied'].map(s => (
             <button
               key={s}
-              onClick={() => { setStatusFilter(s as any); setPage(1); }}
+              onClick={() => { setStatusFilter(s as any); setViewMode('grid'); setPage(1); }}
               className={`w-full flex items-center gap-3 text-left px-4 py-2 rounded-lg font-medium transition-colors ${
-                statusFilter === s
+                (statusFilter === s && viewMode === 'grid')
                   ? 'bg-purple-600 text-white shadow-md'
                   : 'text-slate-700 hover:bg-slate-100'
               }`}
@@ -247,19 +274,22 @@ export default function DashboardPage() {
         </div>
         {/* Calendar toggle button */}
         <button
-          onClick={() => setShowCalendar(v => !v)}
+          onClick={() => {setViewMode('calendar');  setStatusFilter('all');}}
           className={`w-full flex items-center gap-3 text-left px-4 py-2 rounded-lg font-medium transition-colors ${
-          showCalendar ? 'bg-purple-600 text-white shadow-md' : 'text-slate-700 hover:bg-slate-100'
+          viewMode === 'calendar' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-700 hover:bg-slate-100'
           }`}
 >
         <div className="p-1 rounded-full bg-slate-300">📅</div>
               <span>Calendar View</span>
         </button>
+
         <button
-          onClick={() => router.push('/dashboard/analytics')}
-          className="w-full flex items-center gap-3 text-left px-4 py-2 rounded-lg font-medium transition-colors text-slate-700 hover:bg-slate-100"
-          >
-          📊<span>Analytics</span>
+          onClick={() => {setViewMode('analytics'); setStatusFilter('all');}}
+          className={`w-full flex items-center gap-3 text-left px-4 py-2 rounded-lg font-medium transition-colors ${
+            viewMode === 'analytics' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-700 hover:bg-slate-100'
+          }`}
+        >
+    📊 <span>Analytics</span>
         </button>
         <button
           onClick={logout}
@@ -333,40 +363,10 @@ export default function DashboardPage() {
             <p className="text-center text-xl text-slate-500">No applications found.</p>
           ) : (
             <>
-            {showCalendar ? (
-              <div className="bg-white rounded-2xl p-6 shadow-md">
-                <FullCalendar
-                  plugins={[dayGridPlugin, interactionPlugin]}
-                    initialView="dayGridMonth"
-                        height="auto"
-                        events={(apps ?? []).map(app => ({
-                          title: app.companyName,
-                          extendedProps: { status: app.applicationStatus},
-                          date: app.applicationDate,
-                          start: app.applicationDate,
-                          allDay:true,
-                          backgroundColor:
-                            app.applicationStatus === 'Interviewing'
-                              ? '#bfdbfe'
-                              : app.applicationStatus === 'Offer'
-                              ? '#bbf7d0'
-                              : app.applicationStatus === 'Applied'
-                              ? '#fef9c3' 
-                              : app.applicationStatus === 'Rejected'
-                              ? '#fecaca'
-                              : app.applicationStatus === 'To Be Applied'
-                              ? '#e0e7ff'
-                              : '#e5e7eb',
-                            textColor: '#1f2937',
-                          }))}
-                          eventContent={({ event }) => (
-                            <div className="text-left whitespace-normal leading-tight">
-                            <div className="font-semibold">{event.title}</div>
-                            <div className="text-sm text-gray-700">{event.extendedProps.status}</div>
-                          </div>
-                        )}
-                        />
-                      </div>
+            {viewMode === 'calendar' ? (
+              <CalendarComponent apps={apps ?? []} />
+              ) : viewMode === 'analytics' ? (
+                <AnalyticsComponent apps={apps ?? []} />                
             ) : (  
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {paged.map(app => {
@@ -497,6 +497,14 @@ export default function DashboardPage() {
                               <strong className="text-slate-800 font-semibold">Notes:</strong> {app.notes}
                             </p>
                           )}
+                          {(() => {
+                            const suggestion = getSuggestion(app);
+                            return suggestion ? (
+                              <div className="mt-3 p-3 bg-yellow-100 text-yellow-800 rounded-xl text-sm leading-snug shadow-inner">
+      💡                           <strong>Suggestion:</strong> {suggestion}
+                              </div>
+                            ) : null;
+                          })()}
                         </>
                       )}
                     </div>
@@ -506,7 +514,7 @@ export default function DashboardPage() {
             )}
 
               {/* Pagination */}
-              {!showCalendar && (
+              {viewMode === 'grid' && (
               <div className="mt-8 flex justify-center space-x-4">
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
