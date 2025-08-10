@@ -7,6 +7,7 @@ import { BiSort, BiClipboard } from 'react-icons/bi';
 import { FaStar } from 'react-icons/fa';
 import AnalyticsComponent from '@/components/AnalyticsComponent';
 import CalendarComponent from '@/components/CalendarComponent';
+import { computeVisible } from '@/utils/filter';
 
 import {
   FaEdit,
@@ -118,6 +119,21 @@ export default function DashboardPage() {
     fetcher
   );
 
+  const { visible, paged, totalPages } = useMemo(() => {
+    return computeVisible({
+      apps: apps ?? [],
+      viewMode,
+      statusFilter,
+      search,
+      dateFrom,
+      dateTo,
+      sortField,
+      sortAsc,
+      page,
+      pageSize: PAGE_SIZE,
+    });
+  }, [apps, viewMode, statusFilter, search, dateFrom, dateTo, sortField, sortAsc, page]);
+
   // Handlers
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,37 +197,6 @@ export default function DashboardPage() {
     sessionStorage.removeItem('token');
     router.replace('/login');
   };
-
-  // Filtering + sorting
-  const visible = useMemo(() => {
-    let list = (apps ?? [])
-      .filter(a => {
-        if (viewMode !== 'grid') return true;
-        if (statusFilter === 'all') return true;
-        return a.applicationStatus === statusFilter;
-      })
-
-      .filter(a => {
-        const q = search.toLowerCase();
-        return (
-          a.companyName.toLowerCase().includes(q) ||
-          (a.positionTitle || '').toLowerCase().includes(q) ||
-          a.location.toLowerCase().includes(q)
-        );
-      });
-    if (dateFrom) list = list.filter(a => new Date(a.applicationDate) >= new Date(dateFrom));
-    if (dateTo)   list = list.filter(a => new Date(a.applicationDate) <= new Date(dateTo));
-    list.sort((a, b) => {
-      const cmp = sortField === 'name'
-        ? a.companyName.localeCompare(b.companyName)
-        : new Date(a.applicationDate).getTime() - new Date(b.applicationDate).getTime();
-      return sortAsc ? cmp : -cmp;
-    });
-    return list;
-  }, [apps, statusFilter, search, dateFrom, dateTo, sortField, sortAsc]);
-
-  const totalPages = Math.ceil(visible.length / PAGE_SIZE);
-  const paged = visible.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const STATUS_DATE_LABELS: Record<IInternshipApplication['applicationStatus'], string> = {
   Applied: 'Application Date',
