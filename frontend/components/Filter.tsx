@@ -90,3 +90,30 @@ export const computeVisible = (params: ComputeVisibleParams) => {
   const { page, totalPages, slice } = paginate(sorted, params.page, params.pageSize);
   return { visible: sorted, paged: slice, page, totalPages };
 };
+
+export function getSuggestion(app: IInternshipApplication): string | null {
+  const daysSince = Math.floor(
+  (Date.now() - new Date(app.applicationDate).getTime()) / (1000 * 60 * 60 * 24)
+);
+
+ if (app.applicationStatus === 'No Response' && daysSince >= 10) {
+  return `You applied ${daysSince} days ago with no response. Consider sending a follow-up email.`;
+}
+
+ if (app.applicationStatus === 'Interviewing') {
+  return `You mentioned waiting for a reply. Consider checking in with the recruiter.`;
+}
+
+ if (app.applicationStatus === 'To Be Applied') {
+  return `You marked this for future application. Make sure to apply soon!`;
+}
+
+ if (app.applicationStatus === 'Rejected') {
+  return `Improve your resume for your next interview.`;
+}
+ if(app.applicationStatus === "Applied" && daysSince >=90){
+  return  `You applied ${daysSince} days ago with no response. Consider applying again.`;
+ }
+
+ return null;
+}

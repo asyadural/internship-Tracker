@@ -162,46 +162,6 @@ apiRouter.delete(
   }
 );
 
-apiRouter.get(
-  "/users/me",
-  requireAuth,
-  async (req, res) => {
-    try {
-      const userId = (req as any).userId;
-      const user = await getUserById(userId);
-      if (!user) return res.status(404).json({ message: "User not found" });
-      res.json(user);
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  }
-);
 
-// PATCH /users/me
-apiRouter.patch(
-  "/users/me",
-  requireAuth,
-  async (req, res) => {
-    try {
-      const userId = (req as any).userId;
-      const user = await getUserById(userId);
-      if (!user) return res.status(404).json({ message: "User not found" });
-
-      // Update only fields that are sent
-      if (req.body.firstname !== undefined) user.firstname = req.body.firstname;
-      if (req.body.lastname !== undefined) user.lastname = req.body.lastname;
-      if (req.body.email !== undefined) user.email = req.body.email;
-      if (req.body.avatar !== undefined) user.avatar = req.body.avatar;
-
-      // Only update password if provided and non-empty
-      if (req.body.password) user.password = req.body.password;
-
-      await user.save();
-      res.json({ message: "Profile updated" });
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  }
-);
 
 export default apiRouter;

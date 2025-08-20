@@ -7,7 +7,7 @@ import { BiSort, BiClipboard } from 'react-icons/bi';
 import { FaStar } from 'react-icons/fa';
 import AnalyticsComponent from '@/components/AnalyticsComponent';
 import CalendarComponent from '@/components/CalendarComponent';
-import { computeVisible } from '@/utils/filter';
+import { computeVisible } from '@/components/Filter';
 
 import {
   FaEdit,
