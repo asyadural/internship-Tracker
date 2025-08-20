@@ -290,7 +290,7 @@ export default function DashboardPage() {
 
         {/* Header */}
         <header className="bg-white p-6 mb-6 rounded-2xl shadow-md border border-slate-200 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-start justify-between mb-4 gap-2">
             <input
               type="text"
               placeholder="🔍 Search applications..."
@@ -362,7 +362,7 @@ export default function DashboardPage() {
                       className="p-6 bg-white rounded-3xl shadow-lg border border-slate-200 hover:shadow-xl transition-shadow"
                     >
                       {/* Card header */}
-                      <div className="flex items-start justify-between mb-4">
+                      <div className="flex flex-wrap items-start justify-between mb-4 gap-2">
                         <div className="flex items-center">
                           <div className={`p-2 rounded-full mr-4 ${STATUS_STYLES[app.applicationStatus].color}`}>
                             {STATUS_STYLES[app.applicationStatus].icon}
